@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 const Header = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const hideData = ['/login', '/register'];
+	const hideData = ['/login', '/registration'];
 
 	const userData = useSelector((state) => state.userReducer);
 	const dispatch = useDispatch();

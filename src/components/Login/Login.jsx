@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
 import { useDispatch } from 'react-redux';
-import { auth } from '../../store/services';
+import { login } from '../../store/services';
 
 function Login() {
 	const navigate = useNavigate();
@@ -21,9 +21,8 @@ function Login() {
 					className='mx-auto col-12 col-md-6 d-flex flex-column gap-4'
 					onSubmit={(event) => {
 						event.preventDefault();
-						dispatch(auth(name, email, password)).then(() => {
-							navigate('/courses');
-						});
+						dispatch(login(name, email, password));
+						navigate('/courses');
 					}}
 				>
 					<Input

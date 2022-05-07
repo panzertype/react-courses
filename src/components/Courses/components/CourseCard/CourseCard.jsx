@@ -8,6 +8,7 @@ import { noEffectSlice } from '../../../../store/reducers/custom/noEffectSlice';
 
 const CourseCard = (props) => {
 	const navigate = useNavigate();
+	const userData = useSelector((state) => state.userReducer);
 
 	const authors = useSelector((state) => state.authorsReducer);
 	const noEffect = useSelector((state) => state.noEffectReducer);
@@ -63,22 +64,32 @@ const CourseCard = (props) => {
 						style={{ margin: '16px 16px 0 0', display: 'inline-block' }}
 						title='Show course'
 					/>
-					<Button
-						style={{
-							margin: '16px 16px 0 0',
-							width: '40px',
-							padding: '5px',
-							display: 'inline-block',
-						}}
-						title='&#128394;'
-					/>
-					<Button
-						style={{ width: '40px', padding: '5px', display: 'inline-block' }}
-						onClick={() =>
-							dispatch(coursesSlice.actions.removeCourse(props.post))
-						}
-						title='&#128465;'
-					/>
+					{userData.isAuth && userData.role === 'admin' ? (
+						<>
+							<Button
+								style={{
+									margin: '16px 16px 0 0',
+									width: '40px',
+									padding: '5px',
+									display: 'inline-block',
+								}}
+								title='&#128394;'
+							/>
+							<Button
+								style={{
+									width: '40px',
+									padding: '5px',
+									display: 'inline-block',
+								}}
+								onClick={() =>
+									dispatch(coursesSlice.actions.removeCourse(props.post))
+								}
+								title='&#128465;'
+							/>
+						</>
+					) : (
+						''
+					)}
 				</div>
 			</div>
 		</div>

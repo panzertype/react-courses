@@ -23,6 +23,12 @@ export const userSlice = createSlice({
 				state.token = token;
 			}
 		},
+		setUser(state, action) {
+			state.isAuth = true;
+			state.name = action.payload.name;
+			state.email = action.payload.email;
+			state.role = action.payload.role;
+		},
 		login(state, action) {
 			localStorage.setItem('token', action.payload.result);
 			localStorage.setItem('user', JSON.stringify(action.payload.user));

@@ -21,7 +21,25 @@ export const fetchAuthors = () => async (dispatch) => {
 	}
 };
 
-export const auth = (name, email, password) => async (dispatch) => {
+export const addAuthor = async (name, user) => {
+	try {
+		await axios.post(
+			'http://localhost:3000/authors/add',
+			{
+				name,
+			},
+			{
+				headers: {
+					Authorization: user.token,
+				},
+			}
+		);
+	} catch (e) {
+		console.log(e);
+	}
+};
+
+export const login = (name, email, password) => async (dispatch) => {
 	try {
 		const response = await axios.post('http://localhost:3000/login', {
 			name,
@@ -35,7 +53,21 @@ export const auth = (name, email, password) => async (dispatch) => {
 	}
 };
 
-export const register = (name, email, password) => async () => {
+export const logout = (user) => async (dispatch) => {
+	try {
+		await axios.remove('http://localhost:3000/logout', {
+			headers: {
+				Authorization: user.token,
+			},
+		});
+
+		dispatch(userSlice.actions.logout());
+	} catch (e) {
+		console.log(e);
+	}
+};
+
+export const register = async (name, email, password) => {
 	try {
 		await axios.post('http://localhost:3000/register', {
 			name,
@@ -45,4 +77,73 @@ export const register = (name, email, password) => async () => {
 	} catch (e) {
 		console.log(e);
 	}
+};
+
+export const addCourse = async (
+	user,
+	title,
+	description,
+	duration,
+	authors
+) => {
+	try {
+		await axios.post(
+			'http://localhost:3000/courses/add',
+			{
+				title,
+				description,
+				duration,
+				authors,
+			},
+			{
+				headers: {
+					Authorization: user.token,
+				},
+			}
+		);
+	} catch (e) {
+		console.log(e);
+	}
+};
+
+export const removeCourse = async (user, id) => {
+	try {
+		await axios.remove('http://localhost:3000/courses/' + id, {
+			headers: {
+				Authorization: user.token,
+			},
+		});
+	} catch (e) {
+		console.log(e);
+	}
+};
+
+export const editCourse = async (user, id) => {
+	try {
+		await axios.put('http://localhost:3000/courses/' + id, {
+			headers: {
+				Authorization: user.token,
+			},
+		});
+	} catch (e) {
+		console.log(e);
+	}
+};
+
+export const fetchUser = async (dispatch, user) => {
+	try {
+		const response = await axios.get('http://localhost:3000/users/me', {
+			headers: {
+				Authorization: user.token,
+			},
+		});
+
+		dispatch(userSlice.actions.setUser(response.data.result));
+	} catch (e) {
+		console.log(e);
+	}
+};
+
+export const checkAutoLogin = async (dispatch) => {
+	await dispatch(userSlice.actions.getUser());
 };

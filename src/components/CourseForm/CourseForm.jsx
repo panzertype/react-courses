@@ -11,7 +11,7 @@ import { fetchAuthors } from '../../store/services';
 import { authorsSlice } from '../../store/reducers/authors/AuthorsSlice';
 import getTime from '../../helpers/pipeDuration';
 
-const CreateCourse = (props) => {
+const CreateCourse = () => {
 	const navigate = useNavigate();
 
 	const authors = useSelector((state) => state.authorsReducer);

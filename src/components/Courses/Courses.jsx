@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import CourseCard from './components/CourseCard/CourseCard';
 import SearchBar from './components/SearchBar/SearchBar';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCourses } from '../../store/services';
+import { fetchCourses, fetchUser } from '../../store/services';
 import { noEffectSlice } from '../../store/reducers/custom/noEffectSlice';
 import getTime from '../../helpers/pipeDuration';
 
@@ -12,6 +12,7 @@ const Courses = () => {
 	const dispatch = useDispatch();
 
 	useEffect(() => {
+		// dispatch(fetchUser());
 		if (!noEffect.courses) {
 			dispatch(fetchCourses());
 		} else {

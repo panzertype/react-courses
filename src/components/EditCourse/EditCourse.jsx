@@ -6,12 +6,6 @@ import { fetchCourses } from '../../store/services';
 
 const EditCourse = () => {
 	const navigate = useNavigate();
-	const dispatch = useDispatch();
-
-	useEffect(() => {
-		console.log('parent effect');
-		dispatch(fetchCourses());
-	});
 
 	return (
 		<CourseForm

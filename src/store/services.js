@@ -130,19 +130,31 @@ export const removeCourse = (user, id) => async (dispatch) => {
 	}
 };
 
-export const editCourse = (user, id) => async (dispatch) => {
-	try {
-		const response = await axios.put('http://localhost:3000/courses/' + id, {
-			headers: {
-				Authorization: user.token,
-			},
-		});
+export const editCourse =
+	(user, id, title, description, duration, authors) => async (dispatch) => {
+		try {
+			const response = await axios.put(
+				'http://localhost:3000/courses/' + id,
+				{
+					title,
+					description,
+					duration,
+					authors,
+				},
+				{
+					headers: {
+						Authorization: user.token,
+					},
+				}
+			);
 
-		dispatch(coursesSlice.actions.editCourse({ id, ...response.data.result }));
-	} catch (e) {
-		console.log(e);
-	}
-};
+			dispatch(
+				coursesSlice.actions.editCourse({ id, ...response.data.result })
+			);
+		} catch (e) {
+			console.log(e);
+		}
+	};
 
 export const fetchUser = async (dispatch, user) => {
 	try {

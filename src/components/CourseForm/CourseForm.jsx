@@ -21,65 +21,74 @@ const CourseForm = (props) => {
 	const user = useSelector((state) => state.userReducer);
 	const authors = useSelector((state) => state.authorsReducer);
 	const courses = useSelector((state) => state.coursesReducer);
-	console.log('courses', courses);
+	// console.log('courses', courses);
+	// console.log('authors', authors);
 
 	const course = courses.find((b) => b.id === courseId) || {};
+
+	const [state, setState] = useState({
+		courseTitle: '',
+		courseDescription: '',
+		duration: '',
+	});
+
+	const [availableAuthors, setAvailableAuthors] = useState([]);
+	const [addedAuthors, setAddedAuthors] = useState([]);
 
 	useEffect(() => {
 		console.log('effect');
 		dispatch(fetchAuthors());
-	}, []);
+		dispatch(fetchCourses());
+	}, [dispatch]);
 
-	const [availableAuthors, setAvailableAuthors] = useState(authors);
-	const [addedAuthors, setAddedAuthors] = useState([]);
+	useEffect(() => {
+		if (
+			course &&
+			Object.keys(course).length !== 0 &&
+			props.formType === 'update'
+		) {
+			const newState = {
+				courseTitle: course.title,
+				courseDescription: course.description,
+				duration: course.duration,
+			};
+			setState({ ...newState });
+			if (authors) {
+				setAvailableAuthors(authors.filter((a) => !addedAuthors.includes(a)));
+			}
+		}
+	}, [course, authors]);
 
-	if (authors.length !== availableAuthors.length && addedAuthors.length === 0) {
-		// if (props.formType === 'create') {
-		// 	setAvailableAuthors(authors);
-		// } else {
-		// 	setAvailableAuthors(
-		// 		authors.filter((a) => addedAuthors.some((b) => a === b))
-		// 	);
-		// }
-		setAvailableAuthors(authors);
-	}
+	useEffect(() => {
+		if (props.formType === 'create') {
+			setAvailableAuthors(authors.filter((a) => !addedAuthors.includes(a)));
+		}
+	}, [authors]);
 
-	console.log('course', course);
-	const [courseTitle, setCourseTitle] = useState(
-		props.formType === 'create' ? '' : course.title
-	);
-	const [courseDescription, setCourseDescription] = useState(
-		props.formType === 'create' ? '' : course.description
-	);
+	const { courseTitle, courseDescription, duration } = state;
+
+	// console.log('course', course);
+	// const [courseTitle, setCourseTitle] = useState('');
+
+	// const [courseDescription, setCourseDescription] = useState('');
+
 	const [newAuthorValue, setNewAuthorValue] = useState('');
 
-	const [duration, setDuration] = useState(
-		props.formType === 'create' ? '' : course.duration
-	);
-
-	// const [courseTitle, setCourseTitle] = useState('');
-	// const [courseDescription, setCourseDescription] = useState('');
-	// const [newAuthorValue, setNewAuthorValue] = useState('');
 	// const [duration, setDuration] = useState('');
 
-	// if (Object.keys(course).length !== 0 && props.formType === 'update') {
-	// 	console.log(2222);
-	// 	setCourseTitle(course.title);
-	// }
-
-	// if (!!course && props.formType === 'update') {
-	// 	setCourseTitle(course.title);
-	// 	setCourseDescription(course.description);
-	// 	setDuration(course.duration);
-	// }
+	const handleInputChange = (event) => {
+		let { name, value } = event.target;
+		setState({ ...state, [name]: value });
+	};
 
 	return (
 		<div className='border border-info border-2 d-flex flex-column gap-4 p-4'>
 			<Button onClick={props.onCancel} title='Cancel' />
 			<div className='d-flex flex-wrap align-items-end justify-content-between'>
 				<Input
-					value={courseTitle}
-					onChange={(event) => setCourseTitle(event.target.value)}
+					name='courseTitle'
+					value={courseTitle || ''}
+					onChange={handleInputChange}
 					inputName='Title'
 					placeholder='Enter title...'
 					type='text'
@@ -105,7 +114,16 @@ const CourseForm = (props) => {
 												addedAuthors.map((author) => author.id)
 											)
 									  )
-									: dispatch(editCourse(user, props.course.id));
+									: dispatch(
+											editCourse(
+												user,
+												courseId,
+												courseTitle,
+												courseDescription,
+												+duration,
+												addedAuthors.map((author) => author.id)
+											)
+									  );
 							}
 							navigate('/courses');
 						} else {
@@ -115,8 +133,9 @@ const CourseForm = (props) => {
 				/>
 			</div>
 			<Input
-				value={courseDescription}
-				onChange={(event) => setCourseDescription(event.target.value)}
+				name='courseDescription'
+				value={courseDescription || ''}
+				onChange={handleInputChange}
 				inputName='Description'
 				type='textarea'
 				placeholder='Enter description...'
@@ -142,6 +161,7 @@ const CourseForm = (props) => {
 							onClick={() => {
 								if (newAuthorValue) {
 									dispatch(addAuthor(newAuthorValue, user));
+									// setAvailableAuthors([...availableAuthors, newAuthorValue]);
 								}
 							}}
 							title='Create author'
@@ -182,8 +202,9 @@ const CourseForm = (props) => {
 					<div className='col-md-6 p-4'>
 						<h5 className='text-center'>Duration</h5>
 						<Input
-							value={duration}
-							onChange={(event) => setDuration(event.target.value)}
+							name='duration'
+							value={duration || ''}
+							onChange={handleInputChange}
 							style={{ width: '100%' }}
 							inputName='Duration'
 							placeholder='Enter duration in minutes...'

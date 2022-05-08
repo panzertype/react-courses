@@ -12,6 +12,7 @@ const Input = (props) => {
 				<textarea
 					id={props.inputName}
 					value={props.value}
+					name={props.name}
 					onChange={props.onChange}
 					className={
 						props.className ? props.className + ' textarea p-2' : 'textarea p-2'
@@ -26,6 +27,7 @@ const Input = (props) => {
 					id={props.inputName}
 					style={props.style ? { ...props.style } : {}}
 					type={props.type}
+					name={props.name}
 					value={props.value}
 					onChange={props.onChange}
 					className={

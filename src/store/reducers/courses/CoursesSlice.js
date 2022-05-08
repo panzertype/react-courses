@@ -10,10 +10,13 @@ export const coursesSlice = createSlice({
 		addCourse(state, action) {
 			state.push(action.payload);
 		},
-		removeCourse(state, action) {
-			return state.filter(
-				(a) => JSON.stringify(a) !== JSON.stringify(action.payload)
+		editCourse(state, action) {
+			return state.map((a) =>
+				a.id === action.payload.id ? action.payload.result : a
 			);
+		},
+		removeCourse(state, action) {
+			return state.filter((a) => a.id !== action.payload);
 		},
 	},
 });

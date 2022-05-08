@@ -4,13 +4,14 @@ import Button from '../../common/Button/Button';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { userSlice } from '../../store/reducers/user/UserSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../store/services';
 
 const Header = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const hideData = ['/login', '/registration'];
 
-	const userData = useSelector((state) => state.userReducer);
+	const user = useSelector((state) => state.userReducer);
 	const dispatch = useDispatch();
 
 	useEffect(() => {
@@ -20,13 +21,13 @@ const Header = () => {
 	return (
 		<nav className='border border-danger border-2 navbar px-4 py-1'>
 			<Logo />
-			{userData.isAuth && !hideData.some((p) => p === location.pathname) ? (
+			{user.isAuth && !hideData.some((p) => p === location.pathname) ? (
 				<ul className='navbar-nav flex-row gap-3 ms-auto'>
-					<li className='align-self-center'>{userData.name}</li>
+					<li className='align-self-center'>{user.name}</li>
 					<li>
 						<Button
 							onClick={() => {
-								dispatch(userSlice.actions.logout());
+								dispatch(logout(user));
 								navigate('/login');
 							}}
 							title='Logout'

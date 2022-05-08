@@ -2,6 +2,7 @@ import axios from 'axios';
 import { coursesSlice } from './reducers/courses/CoursesSlice';
 import { authorsSlice } from './reducers/authors/AuthorsSlice';
 import { userSlice } from './reducers/user/UserSlice';
+// import { createAsyncThunk } from '@reduxjs/toolkit';
 
 export const fetchCourses = () => async (dispatch) => {
 	try {
@@ -12,6 +13,18 @@ export const fetchCourses = () => async (dispatch) => {
 	}
 };
 
+// export const fetchCourses = createAsyncThunk(
+// 	'courses/fetchAll',
+// 	async (_, thunkApi) => {
+// 		try {
+// 			const response = await axios.get('http://localhost:3000/courses/all');
+// 			return response.data;
+// 		} catch (e) {
+// 			console.log(e);
+// 		}
+// 	}
+// );
+
 export const fetchAuthors = () => async (dispatch) => {
 	try {
 		const response = await axios.get('http://localhost:3000/authors/all');
@@ -21,9 +34,9 @@ export const fetchAuthors = () => async (dispatch) => {
 	}
 };
 
-export const addAuthor = async (name, user) => {
+export const addAuthor = (name, user) => async (dispatch) => {
 	try {
-		await axios.post(
+		const response = await axios.post(
 			'http://localhost:3000/authors/add',
 			{
 				name,
@@ -34,6 +47,8 @@ export const addAuthor = async (name, user) => {
 				},
 			}
 		);
+
+		dispatch(authorsSlice.actions.addAuthor(response.data.result));
 	} catch (e) {
 		console.log(e);
 	}
@@ -55,7 +70,7 @@ export const login = (name, email, password) => async (dispatch) => {
 
 export const logout = (user) => async (dispatch) => {
 	try {
-		await axios.remove('http://localhost:3000/logout', {
+		await axios.delete('http://localhost:3000/logout', {
 			headers: {
 				Authorization: user.token,
 			},
@@ -79,52 +94,51 @@ export const register = async (name, email, password) => {
 	}
 };
 
-export const addCourse = async (
-	user,
-	title,
-	description,
-	duration,
-	authors
-) => {
-	try {
-		await axios.post(
-			'http://localhost:3000/courses/add',
-			{
-				title,
-				description,
-				duration,
-				authors,
-			},
-			{
-				headers: {
-					Authorization: user.token,
+export const addCourse =
+	(user, title, description, duration, authors) => async () => {
+		try {
+			await axios.post(
+				'http://localhost:3000/courses/add',
+				{
+					title,
+					description,
+					duration,
+					authors,
 				},
-			}
-		);
+				{
+					headers: {
+						Authorization: user.token,
+					},
+				}
+			);
+		} catch (e) {
+			console.log(e);
+		}
+	};
+
+export const removeCourse = (user, id) => async (dispatch) => {
+	try {
+		await axios.delete('http://localhost:3000/courses/' + id, {
+			headers: {
+				Authorization: user.token,
+			},
+		});
+
+		dispatch(coursesSlice.actions.removeCourse(id));
 	} catch (e) {
 		console.log(e);
 	}
 };
 
-export const removeCourse = async (user, id) => {
+export const editCourse = (user, id) => async (dispatch) => {
 	try {
-		await axios.remove('http://localhost:3000/courses/' + id, {
+		const response = await axios.put('http://localhost:3000/courses/' + id, {
 			headers: {
 				Authorization: user.token,
 			},
 		});
-	} catch (e) {
-		console.log(e);
-	}
-};
 
-export const editCourse = async (user, id) => {
-	try {
-		await axios.put('http://localhost:3000/courses/' + id, {
-			headers: {
-				Authorization: user.token,
-			},
-		});
+		dispatch(coursesSlice.actions.editCourse({ id, ...response.data.result }));
 	} catch (e) {
 		console.log(e);
 	}

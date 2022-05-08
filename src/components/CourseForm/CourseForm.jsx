@@ -1,43 +1,81 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../../common/Button/Button';
 import Input from '../../common/Input/Input';
-import { v4 as uuidv4 } from 'uuid';
-import getCurrentDate from '../../helpers/dateGenerator';
 import { useDispatch, useSelector } from 'react-redux';
-import { coursesSlice } from '../../store/reducers/courses/CoursesSlice';
-import { noEffectSlice } from '../../store/reducers/custom/noEffectSlice';
-import { fetchAuthors } from '../../store/services';
-import { authorsSlice } from '../../store/reducers/authors/AuthorsSlice';
+import {
+	addCourse,
+	editCourse,
+	addAuthor,
+	fetchAuthors,
+	fetchCourses,
+} from '../../store/services';
 import getTime from '../../helpers/pipeDuration';
 
-const CreateCourse = () => {
-	const navigate = useNavigate();
+const CourseForm = (props) => {
+	const { courseId } = useParams();
 
-	const authors = useSelector((state) => state.authorsReducer);
+	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
+	const user = useSelector((state) => state.userReducer);
+	const authors = useSelector((state) => state.authorsReducer);
+	const courses = useSelector((state) => state.coursesReducer);
+	console.log('courses', courses);
+
+	const course = courses.find((b) => b.id === courseId) || {};
+
 	useEffect(() => {
+		console.log('effect');
 		dispatch(fetchAuthors());
 	}, []);
 
 	const [availableAuthors, setAvailableAuthors] = useState(authors);
 	const [addedAuthors, setAddedAuthors] = useState([]);
 
-	const [courseTitle, setCourseTitle] = useState('');
-	const [courseDescription, setCourseDescription] = useState('');
+	if (authors.length !== availableAuthors.length && addedAuthors.length === 0) {
+		// if (props.formType === 'create') {
+		// 	setAvailableAuthors(authors);
+		// } else {
+		// 	setAvailableAuthors(
+		// 		authors.filter((a) => addedAuthors.some((b) => a === b))
+		// 	);
+		// }
+		setAvailableAuthors(authors);
+	}
+
+	console.log('course', course);
+	const [courseTitle, setCourseTitle] = useState(
+		props.formType === 'create' ? '' : course.title
+	);
+	const [courseDescription, setCourseDescription] = useState(
+		props.formType === 'create' ? '' : course.description
+	);
 	const [newAuthorValue, setNewAuthorValue] = useState('');
 
-	const [duration, setDuration] = useState('');
+	const [duration, setDuration] = useState(
+		props.formType === 'create' ? '' : course.duration
+	);
+
+	// const [courseTitle, setCourseTitle] = useState('');
+	// const [courseDescription, setCourseDescription] = useState('');
+	// const [newAuthorValue, setNewAuthorValue] = useState('');
+	// const [duration, setDuration] = useState('');
+
+	// if (Object.keys(course).length !== 0 && props.formType === 'update') {
+	// 	console.log(2222);
+	// 	setCourseTitle(course.title);
+	// }
+
+	// if (!!course && props.formType === 'update') {
+	// 	setCourseTitle(course.title);
+	// 	setCourseDescription(course.description);
+	// 	setDuration(course.duration);
+	// }
 
 	return (
 		<div className='border border-info border-2 d-flex flex-column gap-4 p-4'>
-			<Button
-				onClick={() => {
-					navigate('/courses');
-				}}
-				title='Cancel'
-			/>
+			<Button onClick={props.onCancel} title='Cancel' />
 			<div className='d-flex flex-wrap align-items-end justify-content-between'>
 				<Input
 					value={courseTitle}
@@ -47,7 +85,7 @@ const CreateCourse = () => {
 					type='text'
 				/>
 				<Button
-					title='Create course'
+					title={props.saveButtonTitle}
 					onClick={() => {
 						if (
 							courseTitle &&
@@ -55,17 +93,20 @@ const CreateCourse = () => {
 							duration &&
 							addedAuthors.length > 0
 						) {
-							dispatch(
-								coursesSlice.actions.addCourse({
-									id: uuidv4(),
-									title: courseTitle,
-									description: courseDescription,
-									creationDate: getCurrentDate(),
-									duration,
-									authors: addedAuthors.map((author) => author.id),
-								})
-							);
-							dispatch(noEffectSlice.actions.toggleCoursesState());
+							// eslint-disable-next-line no-lone-blocks
+							{
+								props.formType === 'create'
+									? dispatch(
+											addCourse(
+												user,
+												courseTitle,
+												courseDescription,
+												+duration,
+												addedAuthors.map((author) => author.id)
+											)
+									  )
+									: dispatch(editCourse(user, props.course.id));
+							}
 							navigate('/courses');
 						} else {
 							alert('Please, fill in all fields');
@@ -100,14 +141,7 @@ const CreateCourse = () => {
 						<Button
 							onClick={() => {
 								if (newAuthorValue) {
-									const newAuthor = {
-										id: uuidv4(),
-										name: newAuthorValue,
-									};
-
-									setAvailableAuthors([...availableAuthors, newAuthor]);
-									dispatch(authorsSlice.actions.addAuthor(newAuthor));
-									dispatch(noEffectSlice.actions.toggleAuthorsState());
+									dispatch(addAuthor(newAuthorValue, user));
 								}
 							}}
 							title='Create author'
@@ -117,7 +151,7 @@ const CreateCourse = () => {
 					<div className='d-flex flex-column gap-3 col-md-6 p-4'>
 						<h5 className='text-center'>Authors</h5>
 						{availableAuthors.length > 0 ? (
-							availableAuthors.map((author, index) => (
+							availableAuthors.map((author) => (
 								<div
 									key={author.id}
 									className='d-flex flex-row align-items-center justify-content-between'
@@ -148,6 +182,7 @@ const CreateCourse = () => {
 					<div className='col-md-6 p-4'>
 						<h5 className='text-center'>Duration</h5>
 						<Input
+							value={duration}
 							onChange={(event) => setDuration(event.target.value)}
 							style={{ width: '100%' }}
 							inputName='Duration'
@@ -168,7 +203,7 @@ const CreateCourse = () => {
 					<div className='col-md-6 d-flex flex-column gap-3 col-md-6 p-4'>
 						<h5 className='text-center'>Course authors</h5>
 						{addedAuthors.length > 0 ? (
-							addedAuthors.map((author, index) => (
+							addedAuthors.map((author) => (
 								<div
 									key={author.id}
 									className='d-flex flex-row align-items-center justify-content-between'
@@ -200,4 +235,4 @@ const CreateCourse = () => {
 	);
 };
 
-export default CreateCourse;
+export default CourseForm;

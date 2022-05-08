@@ -64,7 +64,7 @@ const CourseInfo = () => {
 					</div>
 				</>
 			) : (
-				''
+				<h2 className='text-center'>Course not found!</h2>
 			)}
 		</div>
 	);

@@ -46,6 +46,7 @@ export const userSlice = createSlice({
 			state.name = '';
 			state.email = '';
 			state.token = '';
+			state.role = '';
 		},
 	},
 });

@@ -3,21 +3,14 @@ import CourseCard from './components/CourseCard/CourseCard';
 import SearchBar from './components/SearchBar/SearchBar';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCourses, fetchUser } from '../../store/services';
-import { noEffectSlice } from '../../store/reducers/custom/noEffectSlice';
 import getTime from '../../helpers/pipeDuration';
 
 const Courses = () => {
 	const courses = useSelector((state) => state.coursesReducer);
-	const noEffect = useSelector((state) => state.noEffectReducer);
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-		// dispatch(fetchUser());
-		if (!noEffect.courses) {
-			dispatch(fetchCourses());
-		} else {
-			dispatch(noEffectSlice.actions.toggleCoursesState());
-		}
+		dispatch(fetchCourses());
 	}, []);
 
 	const [searchValue, setSearchValue] = useState('');
@@ -47,8 +40,8 @@ const Courses = () => {
 				labelText='search'
 				placeholderText='Enter course name or id...'
 			/>
-			{searchedCourses.map((post, index) => (
-				<CourseCard key={post.id} post={post} getTime={getTime} />
+			{searchedCourses.map((course) => (
+				<CourseCard key={course.id} course={course} getTime={getTime} />
 			))}
 		</div>
 	);

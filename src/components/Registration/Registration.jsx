@@ -21,7 +21,7 @@ function Registration() {
 					className='mx-auto col-12 col-md-6 d-flex flex-column gap-4'
 					onSubmit={(event) => {
 						event.preventDefault();
-						dispatch(register(name, email, password)).then(() => {
+						register(name, email, password).then(() => {
 							navigate('/login');
 						});
 					}}

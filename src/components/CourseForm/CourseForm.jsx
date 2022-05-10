@@ -36,7 +36,6 @@ const CourseForm = (props) => {
 	const [addedAuthors, setAddedAuthors] = useState([]);
 
 	useEffect(() => {
-		console.log('effect');
 		dispatch(fetchAuthors());
 		dispatch(fetchCourses());
 	}, [dispatch]);
@@ -100,31 +99,32 @@ const CourseForm = (props) => {
 							courseTitle &&
 							courseDescription &&
 							duration &&
-							addedAuthors.length > 0
+							addedAuthors.length > 0 &&
+							props.formType === 'create'
 						) {
-							// eslint-disable-next-line no-lone-blocks
-							{
-								props.formType === 'create'
-									? dispatch(
-											addCourse(
-												user,
-												courseTitle,
-												courseDescription,
-												+duration,
-												addedAuthors.map((author) => author.id)
-											)
-									  )
-									: dispatch(
-											editCourse(
-												user,
-												courseId,
-												courseTitle,
-												courseDescription,
-												+duration,
-												addedAuthors.map((author) => author.id)
-											)
-									  );
-							}
+							addCourse(
+								user,
+								courseTitle,
+								courseDescription,
+								+duration,
+								addedAuthors.map((author) => author.id)
+							);
+							navigate('/courses');
+						} else if (
+							courseTitle &&
+							courseDescription &&
+							duration &&
+							addedAuthors.length > 0 &&
+							props.formType === 'update'
+						) {
+							editCourse(
+								user,
+								courseId,
+								courseTitle,
+								courseDescription,
+								+duration,
+								addedAuthors.map((author) => author.id)
+							);
 							navigate('/courses');
 						} else {
 							alert('Please, fill in all fields');

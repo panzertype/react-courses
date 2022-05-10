@@ -56,6 +56,9 @@ export const addAuthor = (name, user) => async (dispatch) => {
 
 export const login = (name, email, password) => async (dispatch) => {
 	try {
+		if (name === '') {
+			name = null;
+		}
 		const response = await axios.post('http://localhost:3000/login', {
 			name,
 			email,
@@ -94,27 +97,32 @@ export const register = async (name, email, password) => {
 	}
 };
 
-export const addCourse =
-	(user, title, description, duration, authors) => async () => {
-		try {
-			await axios.post(
-				'http://localhost:3000/courses/add',
-				{
-					title,
-					description,
-					duration,
-					authors,
+export const addCourse = async (
+	user,
+	title,
+	description,
+	duration,
+	authors
+) => {
+	try {
+		await axios.post(
+			'http://localhost:3000/courses/add',
+			{
+				title,
+				description,
+				duration,
+				authors,
+			},
+			{
+				headers: {
+					Authorization: user.token,
 				},
-				{
-					headers: {
-						Authorization: user.token,
-					},
-				}
-			);
-		} catch (e) {
-			console.log(e);
-		}
-	};
+			}
+		);
+	} catch (e) {
+		console.log(e);
+	}
+};
 
 export const removeCourse = (user, id) => async (dispatch) => {
 	try {
@@ -130,33 +138,39 @@ export const removeCourse = (user, id) => async (dispatch) => {
 	}
 };
 
-export const editCourse =
-	(user, id, title, description, duration, authors) => async (dispatch) => {
-		try {
-			const response = await axios.put(
-				'http://localhost:3000/courses/' + id,
-				{
-					title,
-					description,
-					duration,
-					authors,
+export const editCourse = async (
+	user,
+	id,
+	title,
+	description,
+	duration,
+	authors
+) => {
+	try {
+		const response = await axios.put(
+			'http://localhost:3000/courses/' + id,
+			{
+				title,
+				description,
+				duration,
+				authors,
+			},
+			{
+				headers: {
+					Authorization: user.token,
 				},
-				{
-					headers: {
-						Authorization: user.token,
-					},
-				}
-			);
+			}
+		);
 
-			dispatch(
-				coursesSlice.actions.editCourse({ id, ...response.data.result })
-			);
-		} catch (e) {
-			console.log(e);
-		}
-	};
+		// dispatch(
+		// 	coursesSlice.actions.editCourse({ id, ...response.data.result })
+		// );
+	} catch (e) {
+		console.log(e);
+	}
+};
 
-export const fetchUser = async (dispatch, user) => {
+export const fetchUser = (user) => async (dispatch) => {
 	try {
 		const response = await axios.get('http://localhost:3000/users/me', {
 			headers: {

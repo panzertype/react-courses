@@ -11,7 +11,7 @@ const Courses = () => {
 
 	useEffect(() => {
 		dispatch(fetchCourses());
-	}, [courses]);
+	}, []);
 
 	const [searchValue, setSearchValue] = useState('');
 	const [searchQuerry, setSearchQuerry] = useState('');

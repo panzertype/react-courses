@@ -1,13 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { fetchAuthors } from '../../services';
+import { addAuthor } from '../../services';
 
 export const authorsSlice = createSlice({
 	name: 'authors',
 	initialState: [],
-	reducers: {
-		setAuthors(state, action) {
+	reducers: {},
+	extraReducers: {
+		[fetchAuthors.fulfilled.type]: (state, action) => {
 			return action.payload;
 		},
-		addAuthor(state, action) {
+		[addAuthor.fulfilled.type]: (state, action) => {
 			state.push(action.payload);
 		},
 	},

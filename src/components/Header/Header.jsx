@@ -21,7 +21,7 @@ const Header = () => {
 	return (
 		<nav className='border border-danger border-2 navbar px-4 py-1'>
 			<Logo />
-			{user.isAuth && !hideData.some((p) => p === location.pathname) ? (
+			{user.isAuth && !hideData.some((p) => p === location.pathname) && (
 				<ul className='navbar-nav flex-row gap-3 ms-auto'>
 					<li className='align-self-center'>{user.name}</li>
 					<li>
@@ -34,8 +34,6 @@ const Header = () => {
 						/>
 					</li>
 				</ul>
-			) : (
-				''
 			)}
 		</nav>
 	);

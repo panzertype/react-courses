@@ -17,9 +17,9 @@ export const AppRouter = () => {
 	useEffect(() => {
 		checkAutoLogin(dispatch);
 		if (user.token) {
-			fetchUser(dispatch, user);
+			dispatch(fetchUser(user));
 		}
-	});
+	}, [user]);
 
 	return (
 		<Routes>
@@ -27,21 +27,17 @@ export const AppRouter = () => {
 			<Route path='/' element={<Layout />}>
 				<Route path='login' element={<Login />} />
 				<Route path='registration' element={<Registration />} />
-				{!!user.isAuth ? (
+				{!!user.isAuth && (
 					<>
 						<Route path='courses' element={<Courses />} />
 						<Route path='courses/:courseId' element={<CourseInfo />} />
 					</>
-				) : (
-					''
 				)}
-				{!!user.isAuth && user.role === 'admin' ? (
+				{!!user.isAuth && user.role === 'admin' && (
 					<>
 						<Route path='courses/add' element={<CreateCourse />} />
 						<Route path='courses/update/:courseId' element={<EditCourse />} />
 					</>
-				) : (
-					''
 				)}
 				<Route path='*' element={<Login />} />
 			</Route>

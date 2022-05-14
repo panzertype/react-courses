@@ -1,93 +1,96 @@
 import axios from 'axios';
-import { coursesSlice } from './reducers/courses/CoursesSlice';
-import { authorsSlice } from './reducers/authors/AuthorsSlice';
-import { userSlice } from './reducers/user/UserSlice';
-// import { createAsyncThunk } from '@reduxjs/toolkit';
+// import { coursesSlice } from './reducers/courses/CoursesSlice';
+// import { authorsSlice } from './reducers/authors/AuthorsSlice';
+// import { userSlice } from './reducers/user/UserSlice';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
-export const fetchCourses = () => async (dispatch) => {
-	try {
-		const response = await axios.get('http://localhost:3000/courses/all');
-		dispatch(coursesSlice.actions.setCourses(response.data.result));
-	} catch (e) {
-		console.log(e);
-	}
-};
-
-// export const fetchCourses = createAsyncThunk(
-// 	'courses/fetchAll',
-// 	async (_, thunkApi) => {
-// 		try {
-// 			const response = await axios.get('http://localhost:3000/courses/all');
-// 			return response.data;
-// 		} catch (e) {
-// 			console.log(e);
-// 		}
-// 	}
-// );
-
-export const fetchAuthors = () => async (dispatch) => {
-	try {
-		const response = await axios.get('http://localhost:3000/authors/all');
-		dispatch(authorsSlice.actions.setAuthors(response.data.result));
-	} catch (e) {
-		console.log(e);
-	}
-};
-
-export const addAuthor = (name, user) => async (dispatch) => {
-	try {
-		const response = await axios.post(
-			'http://localhost:3000/authors/add',
-			{
-				name,
-			},
-			{
-				headers: {
-					Authorization: user.token,
-				},
-			}
-		);
-
-		dispatch(authorsSlice.actions.addAuthor(response.data.result));
-	} catch (e) {
-		console.log(e);
-	}
-};
-
-export const login = (name, email, password) => async (dispatch) => {
-	try {
-		if (name === '') {
-			name = null;
+export const fetchCourses = createAsyncThunk(
+	'courses/fetchAll',
+	async (_, thunkApi) => {
+		try {
+			const response = await axios.get('http://localhost:4000/courses/all');
+			return response.data.result;
+		} catch (e) {
+			console.log(e);
 		}
-		const response = await axios.post('http://localhost:3000/login', {
+	}
+);
+
+export const fetchAuthors = createAsyncThunk(
+	'authors/fetchAll',
+	async (_, thunkApi) => {
+		try {
+			const response = await axios.get('http://localhost:4000/authors/all');
+			return response.data.result;
+		} catch (e) {
+			console.log(e);
+		}
+	}
+);
+
+export const addAuthor = createAsyncThunk(
+	'authors/addAuthor',
+	async (obj, thunkApi) => {
+		try {
+			const name = obj.newAuthorValue;
+			const user = obj.user;
+
+			const response = await axios.post(
+				'http://localhost:4000/authors/add',
+				{
+					name,
+				},
+				{
+					headers: {
+						Authorization: user.token,
+					},
+				}
+			);
+			console.log(response.data.result);
+			return response.data.result;
+		} catch (e) {
+			console.log(e);
+		}
+	}
+);
+
+export const login = createAsyncThunk('user/login', async (obj, thunkApi) => {
+	try {
+		const name = obj.name;
+		const email = obj.email;
+		const password = obj.password;
+
+		const response = await axios.post('http://localhost:4000/login', {
 			name,
 			email,
 			password,
 		});
 
-		dispatch(userSlice.actions.login(response.data));
+		return response.data;
 	} catch (e) {
 		console.log(e);
 	}
-};
+});
 
-export const logout = (user) => async (dispatch) => {
-	try {
-		await axios.delete('http://localhost:3000/logout', {
-			headers: {
-				Authorization: user.token,
-			},
-		});
-
-		dispatch(userSlice.actions.logout());
-	} catch (e) {
-		console.log(e);
+export const logout = createAsyncThunk(
+	'user/logout',
+	async (user, thunkApi) => {
+		try {
+			await axios.delete('http://localhost:4000/logout', {
+				headers: {
+					Authorization: user.token,
+				},
+			});
+			return;
+		} catch (e) {
+			console.log(e);
+		}
 	}
-};
+);
 
 export const register = async (name, email, password) => {
 	try {
-		await axios.post('http://localhost:3000/register', {
+		await axios.post('http://localhost:4000/register', {
 			name,
 			email,
 			password,
@@ -106,7 +109,7 @@ export const addCourse = async (
 ) => {
 	try {
 		await axios.post(
-			'http://localhost:3000/courses/add',
+			'http://localhost:4000/courses/add',
 			{
 				title,
 				description,
@@ -124,19 +127,25 @@ export const addCourse = async (
 	}
 };
 
-export const removeCourse = (user, id) => async (dispatch) => {
-	try {
-		await axios.delete('http://localhost:3000/courses/' + id, {
-			headers: {
-				Authorization: user.token,
-			},
-		});
+export const removeCourse = createAsyncThunk(
+	'courses/removeCourse',
+	async (obj, thunkApi) => {
+		try {
+			const user = obj.user;
+			const id = obj.id;
 
-		dispatch(coursesSlice.actions.removeCourse(id));
-	} catch (e) {
-		console.log(e);
+			await axios.delete('http://localhost:4000/courses/' + id, {
+				headers: {
+					Authorization: user.token,
+				},
+			});
+
+			return id;
+		} catch (e) {
+			console.log(e);
+		}
 	}
-};
+);
 
 export const editCourse = async (
 	user,
@@ -147,8 +156,8 @@ export const editCourse = async (
 	authors
 ) => {
 	try {
-		const response = await axios.put(
-			'http://localhost:3000/courses/' + id,
+		await axios.put(
+			'http://localhost:4000/courses/' + id,
 			{
 				title,
 				description,
@@ -170,20 +179,26 @@ export const editCourse = async (
 	}
 };
 
-export const fetchUser = (user) => async (dispatch) => {
-	try {
-		const response = await axios.get('http://localhost:3000/users/me', {
-			headers: {
-				Authorization: user.token,
-			},
-		});
-
-		dispatch(userSlice.actions.setUser(response.data.result));
-	} catch (e) {
-		console.log(e);
+export const fetchUser = createAsyncThunk(
+	'user/fetchUser',
+	async (user, thunkApi) => {
+		try {
+			const response = await axios.get('http://localhost:4000/users/me', {
+				headers: {
+					Authorization: user.token,
+				},
+			});
+			return response.data.result;
+		} catch (e) {
+			console.log(e);
+		}
 	}
-};
+);
 
-export const checkAutoLogin = async (dispatch) => {
-	await dispatch(userSlice.actions.getUser());
-};
+export const checkAutoLogin = createAsyncThunk(
+	'user/checkAutoLogin',
+	async (_, thunkApi) => {
+		console.log(1);
+		return '';
+	}
+);

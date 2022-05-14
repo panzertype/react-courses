@@ -21,8 +21,6 @@ const CourseForm = (props) => {
 	const user = useSelector((state) => state.userReducer);
 	const authors = useSelector((state) => state.authorsReducer);
 	const courses = useSelector((state) => state.coursesReducer);
-	// console.log('courses', courses);
-	// console.log('authors', authors);
 
 	const course = courses.find((b) => b.id === courseId) || {};
 
@@ -38,7 +36,7 @@ const CourseForm = (props) => {
 	useEffect(() => {
 		dispatch(fetchAuthors());
 		dispatch(fetchCourses());
-	}, [dispatch]);
+	}, []);
 
 	useEffect(() => {
 		if (
@@ -66,14 +64,7 @@ const CourseForm = (props) => {
 
 	const { courseTitle, courseDescription, duration } = state;
 
-	// console.log('course', course);
-	// const [courseTitle, setCourseTitle] = useState('');
-
-	// const [courseDescription, setCourseDescription] = useState('');
-
 	const [newAuthorValue, setNewAuthorValue] = useState('');
-
-	// const [duration, setDuration] = useState('');
 
 	const handleInputChange = (event) => {
 		let { name, value } = event.target;
@@ -160,7 +151,7 @@ const CourseForm = (props) => {
 						<Button
 							onClick={() => {
 								if (newAuthorValue) {
-									dispatch(addAuthor(newAuthorValue, user));
+									dispatch(addAuthor({ newAuthorValue, user }));
 									// setAvailableAuthors([...availableAuthors, newAuthorValue]);
 								}
 							}}
@@ -170,6 +161,11 @@ const CourseForm = (props) => {
 					</div>
 					<div className='d-flex flex-column gap-3 col-md-6 p-4'>
 						<h5 className='text-center'>Authors</h5>
+						{JSON.stringify(addedAuthors)}
+						<br></br>
+						<br></br>
+						<hr></hr>
+						{JSON.stringify(addedAuthors.map((author) => author.id))}
 						{availableAuthors.length > 0 ? (
 							availableAuthors.map((author) => (
 								<div

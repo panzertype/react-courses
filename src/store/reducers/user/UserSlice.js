@@ -1,4 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { login } from '../../services';
+import { logout } from '../../services';
+import { fetchUser } from '../../services';
+import { checkAutoLogin } from '../../services';
 
 const initialState = {
 	isAuth: false,
@@ -23,13 +27,9 @@ export const userSlice = createSlice({
 				state.token = token;
 			}
 		},
-		setUser(state, action) {
-			state.isAuth = true;
-			state.name = action.payload.name;
-			state.email = action.payload.email;
-			state.role = action.payload.role;
-		},
-		login(state, action) {
+	},
+	extraReducers: {
+		[login.fulfilled.type]: (state, action) => {
 			localStorage.setItem('token', action.payload.result);
 			localStorage.setItem('user', JSON.stringify(action.payload.user));
 
@@ -38,7 +38,7 @@ export const userSlice = createSlice({
 			state.email = action.payload.user.email;
 			state.token = action.payload.result;
 		},
-		logout(state) {
+		[logout.fulfilled.type]: (state) => {
 			localStorage.removeItem('token');
 			localStorage.removeItem('user');
 
@@ -47,6 +47,23 @@ export const userSlice = createSlice({
 			state.email = '';
 			state.token = '';
 			state.role = '';
+		},
+		[fetchUser.fulfilled.type]: (state, action) => {
+			state.isAuth = true;
+			state.name = action.payload.name;
+			state.email = action.payload.email;
+			state.role = action.payload.role;
+		},
+		[checkAutoLogin.fulfilled.type]: (state) => {
+			const user = JSON.parse(localStorage.getItem('user'));
+			const token = localStorage.getItem('token');
+
+			if (user && token) {
+				state.isAuth = true;
+				state.name = user.name;
+				state.email = user.email;
+				state.token = token;
+			}
 		},
 	},
 });

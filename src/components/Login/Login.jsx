@@ -21,7 +21,7 @@ function Login() {
 					className='mx-auto col-12 col-md-6 d-flex flex-column gap-4'
 					onSubmit={(event) => {
 						event.preventDefault();
-						dispatch(login(name, email, password));
+						dispatch(login({ name, email, password }));
 						navigate('/courses');
 					}}
 				>

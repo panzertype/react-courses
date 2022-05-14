@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAuthors } from '../../../../store/services';
 import { noEffectSlice } from '../../../../store/reducers/custom/noEffectSlice';
-import { removeCourse, editCourse } from '../../../../store/services';
+import { removeCourse } from '../../../../store/services';
 
 const CourseCard = (props) => {
 	const navigate = useNavigate();
@@ -64,7 +64,7 @@ const CourseCard = (props) => {
 						style={{ margin: '16px 16px 0 0', display: 'inline-block' }}
 						title='Show course'
 					/>
-					{user.isAuth && user.role === 'admin' ? (
+					{user.isAuth && user.role === 'admin' && (
 						<>
 							<Button
 								style={{
@@ -85,13 +85,12 @@ const CourseCard = (props) => {
 									display: 'inline-block',
 								}}
 								onClick={() => {
-									dispatch(removeCourse(user, props.course.id));
+									const id = props.course.id;
+									dispatch(removeCourse({ user, id }));
 								}}
 								title='&#128465;'
 							/>
 						</>
-					) : (
-						''
 					)}
 				</div>
 			</div>

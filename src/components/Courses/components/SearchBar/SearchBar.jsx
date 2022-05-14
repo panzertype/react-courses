@@ -19,14 +19,12 @@ const SearchBar = (props) => {
 				ariaLabel={props.labelText}
 			/>
 			<Button onClick={props.onClick} title='Search' />
-			{userData.isAuth && userData.role === 'admin' ? (
+			{userData.isAuth && userData.role === 'admin' && (
 				<Button
 					className='ms-auto'
 					onClick={() => navigate('/courses/add')}
 					title='Add new course'
 				/>
-			) : (
-				''
 			)}
 		</div>
 	);
